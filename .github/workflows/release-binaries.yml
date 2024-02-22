@@ -1,6 +1,9 @@
 name: Build release binaries
 
 on:
+  push:
+    branches:
+      - build-binaries
   release:
     types: ['created']
 
@@ -16,9 +19,9 @@ jobs:
             target: aarch64-unknown-linux-gnu
           - runner: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-          - runner: macos-latest
+          - runner: macos-14
             target: aarch64-apple-darwin
-          - runner: macos-latest
+          - runner: macos-13
             target: x86_64-apple-darwin
           # - runner: ubuntu-latest
           #   target: x86_64-pc-windows-gnu
@@ -39,7 +42,7 @@ jobs:
           sudo apt-get install -y libz-mingw-w64-dev g++-mingw-w64-x86-64
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@1.70.0
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: llvm-tools-preview
           target: ${{matrix.target}}
@@ -50,9 +53,9 @@ jobs:
           corepack prepare pnpm@latest --activate
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
           cache: pnpm
 
       - name: Install dependencies
@@ -62,6 +65,12 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           shared-key: ${{matrix.target}}
+
+      - name: Check object
+        run: |
+          cat << OBJECT
+          ${{ toJson(github) }}
+          OBJECT
 
       - name: Build library for aarch64-unknown-linux-gnu
         if: ${{matrix.target == 'aarch64-unknown-linux-gnu'}}
@@ -98,6 +107,7 @@ jobs:
       - name: Upload release asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
+        if: ${{ github.event.release.upload_url != '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
