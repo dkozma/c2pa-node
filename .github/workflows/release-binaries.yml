@@ -86,7 +86,7 @@ jobs:
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
         run: |
           mkdir -p generated/${{matrix.target}}
-          cargo-cp-artifact -nc generated/c2pa.node -- cross build --message-format=json-render-diagnostics --release --target=${{matrix.target}}
+          pnpm cargo-cp-artifact -nc generated/c2pa.node -- cross build --message-format=json-render-diagnostics --release --target=${{matrix.target}}
 
       - name: Build library
         id: build-library
