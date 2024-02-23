@@ -77,16 +77,10 @@ jobs:
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
 
-      # - name: Build library for x86_64-pc-windows-gnu
-      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-      #   env:
-      #     CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
-      #     AR_x86_64_pc_windows_gnu: x86_64-w64-mingw32-gcc-ar
-      #     CC_x86_64_pc_windows_gnu: x86_64-w64-mingw32-gcc
-      #     CXX_x86_64_pc_windows_gnu: x86_64-w64-mingw32-g++
-      #   run: |
-      #     mkdir -p generated/${{matrix.target}}
-      #     pnpm run build:rust --target=${{matrix.target}}
+      - name: Build library for x86_64-pc-windows-gnu
+        if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+        run: |
+          vcpkg install openssl:x64-windows
 
       - name: Build library
         id: build-library
