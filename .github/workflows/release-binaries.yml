@@ -75,14 +75,18 @@ jobs:
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
 
+      # - name: Update OpenSSL for x86_64-pc-windows-gnu
+      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+      #   uses: johnwason/vcpkg-action@v6
+      #   with:
+      #     pkgs: openssl
+      #     triplet: x64-windows-release
+      #     token: ${{ github.token }}
+      #     github-binarycache: true
+
       - name: Update OpenSSL for x86_64-pc-windows-gnu
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-        uses: johnwason/vcpkg-action@v6
-        with:
-          pkgs: openssl
-          triplet: x64-windows-release
-          token: ${{ github.token }}
-          github-binarycache: true
+        run: vcpkg install openssl:x64-windows
 
       - name: Build library for x86_64-pc-windows-gnu
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
