@@ -119,8 +119,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ github.event.release.upload_url == '' }}
         with:
-          name: ${{ steps.build-library.outputs.archive }}
-          path: generated/${{ steps.build-library.outputs.archive }}
+          name: ${{ steps.package-artifact.outputs.archive }}
+          path: generated/${{ steps.package-artifact.outputs.archive }}
           retention-days: 3
 
       - name: Upload release asset
@@ -131,6 +131,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: generated/${{ steps.build-library.outputs.archive }}
-          asset_name: ${{ steps.build-library.outputs.archive }}
+          asset_path: generated/${{ steps.package-artifact.outputs.archive }}
+          asset_name: ${{ steps.package-artifact.outputs.archive }}
           asset_content_type: application/tar+gzip
