@@ -84,6 +84,8 @@ jobs:
 
       - name: Build library for x86_64-pc-windows-gnu
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+        env:
+          GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
         run: |
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust-cross --target=${{matrix.target}}
