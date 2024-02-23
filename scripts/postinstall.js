@@ -86,4 +86,8 @@ async function main() {
   downloadTestCerts();
 }
 
-main();
+if (!process.env.SKIP_RUST_BUILD) {
+  main();
+} else {
+  console.log('Skipping Rust build since SKIP_RUST_BUILD is set');
+}

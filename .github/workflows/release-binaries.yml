@@ -53,16 +53,24 @@ jobs:
           corepack enable
           corepack prepare pnpm@latest --activate
 
+      - name: Install cross-compilation toolset
+        run: cargo install cross
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: pnpm
 
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
         with:
           shared-key: ${{matrix.target}}
+
+      - name: Install Node.js dependencies
+        env:
+          SKIP_RUST_BUILD: 1
+        run: pnpm install
 
       - name: Build library for aarch64-unknown-linux-gnu
         if: ${{matrix.target == 'aarch64-unknown-linux-gnu'}}
@@ -71,28 +79,19 @@ jobs:
           CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
           CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
         run: |
-          pnpm install
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
 
       - name: Build library for x86_64-pc-windows-gnu
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-        env:
-          OPENSSL_NO_VENDOR: 1
-          CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
-          AR_x86_64_pc_windows_gnu: x86_64-w64-mingw32-gcc-ar
-          CC_x86_64_pc_windows_gnu: x86_64-w64-mingw32-gcc
-          CXX_x86_64_pc_windows_gnu: x86_64-w64-mingw32-g++
         run: |
-          pnpm install
           mkdir -p generated/${{matrix.target}}
-          pnpm run build:rust --target=${{matrix.target}}
+          cargo-cp-artifact -nc generated/c2pa.node -- cross build --message-format=json-render-diagnostics --release --target=${{matrix.target}}
 
       - name: Build library
         id: build-library
         if: ${{!contains(fromJSON('["aarch64-unknown-linux-gnu"]'), matrix.target)}}
         run: |
-          pnpm install
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
 
