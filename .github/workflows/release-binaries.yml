@@ -64,6 +64,11 @@ jobs:
           node-version: 18
           cache: pnpm
 
+      - name: Update OpenSSL for x86_64-pc-windows-gnu
+        if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+        run: |
+          vcpkg install openssl:x64-windows
+
       - name: Install dependencies
         run: pnpm install
 
@@ -76,11 +81,6 @@ jobs:
         run: |
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
-
-      - name: Update OpenSSL for x86_64-pc-windows-gnu
-        if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-        run: |
-          vcpkg install openssl:x64-windows
 
       - name: Build library
         id: build-library
