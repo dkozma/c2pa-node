@@ -24,7 +24,7 @@ jobs:
           # - target: x86_64-apple-darwin
           #   runner: macos-13
           - target: x86_64-pc-windows-gnu
-            runner: windows-latest
+            runner: ubuntu-latest
 
     steps:
       - name: Checkout
