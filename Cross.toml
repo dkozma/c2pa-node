@@ -1,2 +1,0 @@
-[build.env]
-passthrough = ["GIT_DISCOVERY_ACROSS_FILESYSTEM"]
