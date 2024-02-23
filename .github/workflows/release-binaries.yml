@@ -75,34 +75,9 @@ jobs:
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
 
-      # - name: Update OpenSSL for x86_64-pc-windows-gnu
-      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-      #   uses: johnwason/vcpkg-action@v6
-      #   with:
-      #     pkgs: openssl
-      #     triplet: x64-windows-release
-      #     token: ${{ github.token }}
-      #     github-binarycache: true
-
-      # - name: Restore vcpkg cache
-      #   id: cache-vcpkg-restore
-      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-      #   uses: actions/cache/restore@v4
-      #   with:
-      #     path: C:/vcpkg/packages
-      #     key: ${{ matrix.target }}-vcpkg
-
-      # - name: Update OpenSSL for x86_64-pc-windows-gnu
-      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-      #   run: vcpkg install openssl:x64-windows
-
-      # - name: Cache vcpkg
-      #   id: cache-vcpkg-save
-      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: C:/vcpkg/packages
-      #     key: ${{ matrix.target }}-vcpkg
+      - name: Update OpenSSL for x86_64-pc-windows-gnu
+        if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+        run: pacman -S --noconfirm openssl-devel
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
@@ -111,8 +86,6 @@ jobs:
 
       - name: Build library for x86_64-pc-windows-gnu
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-        env:
-          OPENSSL_DIR: C:/vcpkg/packages/openssl_x64-windows
         run: |
           pnpm install
           mkdir -p generated/${{matrix.target}}
