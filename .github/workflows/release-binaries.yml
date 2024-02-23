@@ -64,6 +64,17 @@ jobs:
           node-version: 18
           cache: pnpm
 
+      - name: Build library for aarch64-unknown-linux-gnu
+        if: ${{matrix.target == 'aarch64-unknown-linux-gnu'}}
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+          CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
+        run: |
+          pnpm install
+          mkdir -p generated/${{matrix.target}}
+          pnpm run build:rust --target=${{matrix.target}}
+
       - name: Update OpenSSL for x86_64-pc-windows-gnu
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
         uses: johnwason/vcpkg-action@v6
@@ -73,23 +84,20 @@ jobs:
           token: ${{ github.token }}
           github-binarycache: true
 
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build library for aarch64-unknown-linux-gnu
-        if: ${{matrix.target == 'aarch64-unknown-linux-gnu'}}
+      - name: Build library for x86_64-pc-windows-gnu
+        if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
         env:
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
-          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
-          CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
+          OPENSSL_DIR: C:/vcpkg/packages/openssl_x64-windows
         run: |
+          pnpm install
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
 
       - name: Build library
         id: build-library
-        if: ${{!contains(fromJSON('["aarch64-unknown-linux-gnu"]'), matrix.target)}}
+        if: ${{!contains(fromJSON('["aarch64-unknown-linux-gnu", "x86_64-pc-windows-gnu"]'), matrix.target)}}
         run: |
+          pnpm install
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
 
