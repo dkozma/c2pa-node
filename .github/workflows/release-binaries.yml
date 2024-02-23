@@ -23,8 +23,9 @@ jobs:
           #   runner: macos-14
           # - target: x86_64-apple-darwin
           #   runner: macos-13
-          - runner: ubuntu-latest
-            target: x86_64-pc-windows-gnu
+          - target: x86_64-pc-windows-gnu
+            runner: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,7 +40,7 @@ jobs:
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
         run: |
           sudo apt-get update
-          sudo apt-get install -y libz-mingw-w64-dev g++-mingw-w64-x86-64
+          sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
