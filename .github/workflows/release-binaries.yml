@@ -75,9 +75,9 @@ jobs:
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
 
-      - name: Update OpenSSL for x86_64-pc-windows-gnu
-        if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-        run: pacman -S --noconfirm openssl-devel
+      # - name: Update OpenSSL for x86_64-pc-windows-gnu
+      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+      #   run: pacman -S --noconfirm openssl-devel
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
