@@ -34,6 +34,6 @@ tokio = { version = "1.36.0", features = ["rt-multi-thread", "sync"] }
 
 [dependencies.neon]
 git = "https://github.com/neon-bindings/neon"
-ref = "50c74c0"
+rev = "50c74c0"
 default-features = false
 features = ["futures", "napi-6"]

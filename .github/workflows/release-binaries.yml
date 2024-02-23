@@ -84,9 +84,30 @@ jobs:
       #     token: ${{ github.token }}
       #     github-binarycache: true
 
-      - name: Update OpenSSL for x86_64-pc-windows-gnu
-        if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-        run: vcpkg install openssl:x64-windows
+      # - name: Restore vcpkg cache
+      #   id: cache-vcpkg-restore
+      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+      #   uses: actions/cache/restore@v4
+      #   with:
+      #     path: C:/vcpkg/packages
+      #     key: ${{ matrix.target }}-vcpkg
+
+      # - name: Update OpenSSL for x86_64-pc-windows-gnu
+      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+      #   run: vcpkg install openssl:x64-windows
+
+      # - name: Cache vcpkg
+      #   id: cache-vcpkg-save
+      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: C:/vcpkg/packages
+      #     key: ${{ matrix.target }}-vcpkg
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
 
       - name: Build library for x86_64-pc-windows-gnu
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
