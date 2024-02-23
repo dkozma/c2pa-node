@@ -15,14 +15,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-          - runner: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - runner: macos-14
-            target: aarch64-apple-darwin
-          - runner: macos-13
-            target: x86_64-apple-darwin
+          - target: aarch64-unknown-linux-gnu
+            runner: macos-14
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+          - target: aarch64-apple-darwin
+            runner: macos-14
+          - target: x86_64-apple-darwin
+            runner: macos-13
           # - runner: ubuntu-latest
           #   target: x86_64-pc-windows-gnu
     steps:
@@ -72,31 +72,30 @@ jobs:
           ${{ toJson(github) }}
           OBJECT
 
-      - name: Build library for aarch64-unknown-linux-gnu
-        if: ${{matrix.target == 'aarch64-unknown-linux-gnu'}}
-        env:
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
-          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
-          CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
-        run: |
-          mkdir -p generated/${{matrix.target}}
-          pnpm run build:rust --target=${{matrix.target}}
-          mv generated/c2pa.node generated/${{matrix.target}}/c2pa.node
+      # - name: Build library for aarch64-unknown-linux-gnu
+      #   if: ${{matrix.target == 'aarch64-unknown-linux-gnu'}}
+      #   env:
+      #     CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+      #     CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+      #     CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
+      #   run: |
+      #     mkdir -p generated/${{matrix.target}}
+      #     pnpm run build:rust --target=${{matrix.target}}
+      #     mv generated/c2pa.node generated/${{matrix.target}}/c2pa.node
 
-      - name: Build library for x86_64-pc-windows-gnu
-        if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-        env:
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: x86_64-w64-mingw32-gcc
-          CC_aarch64_unknown_linux_gnu: x86_64-w64-mingw32-gcc
-          CXX_aarch64_unknown_linux_gnu: x86_64-w64-mingw32-g++
-        run: |
-          mkdir -p generated/${{matrix.target}}
-          pnpm run build:rust --target=${{matrix.target}}
-          mv generated/c2pa.node generated/${{matrix.target}}/c2pa.node
+      # - name: Build library for x86_64-pc-windows-gnu
+      #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
+      #   env:
+      #     CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: x86_64-w64-mingw32-gcc
+      #     CC_aarch64_unknown_linux_gnu: x86_64-w64-mingw32-gcc
+      #     CXX_aarch64_unknown_linux_gnu: x86_64-w64-mingw32-g++
+      #   run: |
+      #     mkdir -p generated/${{matrix.target}}
+      #     pnpm run build:rust --target=${{matrix.target}}
+      #     mv generated/c2pa.node generated/${{matrix.target}}/c2pa.node
 
       - name: Build library
         id: build-library
-        if: ${{!contains(fromJSON('["aarch64-unknown-linux-gnu", "x86_64-pc-windows-gnu"]'), matrix.target)}}
         run: |
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
