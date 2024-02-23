@@ -16,7 +16,7 @@ jobs:
       matrix:
         include:
           - target: aarch64-unknown-linux-gnu
-            runner: macos-14
+            runner: ubuntu-latest
           - target: x86_64-unknown-linux-gnu
             runner: ubuntu-latest
           - target: aarch64-apple-darwin
@@ -72,16 +72,15 @@ jobs:
           ${{ toJson(github) }}
           OBJECT
 
-      # - name: Build library for aarch64-unknown-linux-gnu
-      #   if: ${{matrix.target == 'aarch64-unknown-linux-gnu'}}
-      #   env:
-      #     CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
-      #     CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
-      #     CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
-      #   run: |
-      #     mkdir -p generated/${{matrix.target}}
-      #     pnpm run build:rust --target=${{matrix.target}}
-      #     mv generated/c2pa.node generated/${{matrix.target}}/c2pa.node
+      - name: Build library for aarch64-unknown-linux-gnu
+        if: ${{matrix.target == 'aarch64-unknown-linux-gnu'}}
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
+          CXX_aarch64_unknown_linux_gnu: aarch64-linux-gnu-g++
+        run: |
+          mkdir -p generated/${{matrix.target}}
+          pnpm run build:rust --target=${{matrix.target}}
 
       # - name: Build library for x86_64-pc-windows-gnu
       #   if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
@@ -92,16 +91,28 @@ jobs:
       #   run: |
       #     mkdir -p generated/${{matrix.target}}
       #     pnpm run build:rust --target=${{matrix.target}}
-      #     mv generated/c2pa.node generated/${{matrix.target}}/c2pa.node
 
       - name: Build library
         id: build-library
+        if: ${{!contains(fromJSON('["aarch64-unknown-linux-gnu", "x86_64-pc-windows-gnu"]'), matrix.target)}}
         run: |
           mkdir -p generated/${{matrix.target}}
           pnpm run build:rust --target=${{matrix.target}}
+
+      - name: Get short SHA
+        id: get-short-sha
+        if: ${{ github.event.release.upload_url == '' }}
+        run: |
+          echo 'short_sha=$(git rev-parse --short "$GITHUB_SHA")' >> "$GITHUB_OUTPUT"
+
+      - name: Package artifact
+        id: package-artifact
+        env:
+          ARCHIVE_FILENAME: c2pa-node_${{matrix.target}}-${{ github.event.release.tag_name || steps.get-short-sha.outputs.short_sha }}.tar.gz
+        run: |
           cd generated
-          tar cvfz c2pa-node_${{matrix.target}}-${{ github.event.release.tag_name }}.tar.gz c2pa.node
-          echo "archive=c2pa-node_${{matrix.target}}-${{ github.event.release.tag_name }}.tar.gz" >> "$GITHUB_OUTPUT"
+          tar cvfz $ARCHIVE_FILENAME c2pa.node
+          echo "archive=$ARCHIVE_FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact
         id: upload-artifact
