@@ -66,8 +66,12 @@ jobs:
 
       - name: Update OpenSSL for x86_64-pc-windows-gnu
         if: ${{matrix.target == 'x86_64-pc-windows-gnu'}}
-        run: |
-          vcpkg install openssl:x64-windows
+        uses: johnwason/vcpkg-action@v6
+        with:
+          pkgs: openssl
+          triplet: x64-windows-release
+          token: ${{ github.token }}
+          github-binarycache: true
 
       - name: Install dependencies
         run: pnpm install
