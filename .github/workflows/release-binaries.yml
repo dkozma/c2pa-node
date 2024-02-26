@@ -83,10 +83,10 @@ jobs:
       - name: Package artifact
         id: package-artifact
         env:
-          ARCHIVE_FILENAME: c2pa-node_${{matrix.target}}-${{ github.event.release.tag_name || 'dev' }}.tar.gz
+          ARCHIVE_FILENAME: c2pa-node_${{matrix.target}}-${{ github.event.release.tag_name || 'dev' }}.zip
         run: |
           cd generated
-          tar cvfz "$ARCHIVE_FILENAME" c2pa.node
+          zip "$ARCHIVE_FILENAME" c2pa.node
           echo "archive=$ARCHIVE_FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact (development only)
@@ -108,4 +108,4 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: generated/${{ steps.package-artifact.outputs.archive }}
           asset_name: ${{ steps.package-artifact.outputs.archive }}
-          asset_content_type: application/tar+gzip
+          asset_content_type: application/zip
