@@ -86,8 +86,8 @@ jobs:
           ARCHIVE_FILENAME: c2pa-node_${{matrix.target}}-${{ github.event.release.tag_name || 'dev' }}.zip
         run: |
           cd generated
-          7z a -tzip "$ARCHIVE_FILENAME" c2pa.node
-          echo "archive=$ARCHIVE_FILENAME" >> "$GITHUB_OUTPUT"
+          7z a -tzip "${{ env.ARCHIVE_FILENAME }}" c2pa.node
+          echo "archive=${{ env.ARCHIVE_FILENAME }}" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact (development only)
         id: upload-artifact
