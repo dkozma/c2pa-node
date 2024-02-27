@@ -82,6 +82,8 @@ jobs:
 
       - name: Package artifact
         id: package-artifact
+        # This needs to be set so that this works on a Windows runner
+        shell: bash
         env:
           ARCHIVE_FILENAME: c2pa-node_${{matrix.target}}-${{ github.event.release.tag_name || 'dev' }}.zip
         run: |
