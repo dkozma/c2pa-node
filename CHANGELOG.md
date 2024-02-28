@@ -1,5 +1,11 @@
 # c2pa-node
 
+## 0.5.16
+
+### Patch Changes
+
+- f0bc3c7: Upload release flow 4
+
 ## 0.5.15
 
 ### Patch Changes
