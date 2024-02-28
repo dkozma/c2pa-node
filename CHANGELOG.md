@@ -1,5 +1,11 @@
 # c2pa-node
 
+## 0.5.14
+
+### Patch Changes
+
+- 45e921f: Update release flow
+
 ## 0.5.13
 
 ### Patch Changes
