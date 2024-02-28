@@ -25,6 +25,8 @@ jobs:
           node-version: 18
           cache: pnpm
 
-      - run: pnpm install
+      - env:
+          SKIP_RUST_BUILD: 1
+        run: pnpm install
       - run: pnpm run build
       - run: pnpm run ci
