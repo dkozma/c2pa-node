@@ -1,7 +1,9 @@
 name: Release
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - test-release
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -44,6 +46,8 @@ jobs:
     if: ${{ needs.release.outputs.published }}
     name: Build binaries for ${{matrix.target}}
     runs-on: ${{matrix.runner}}
+    env:
+      PUBLISHED_VERSION: ${{ fromJson(needs.release.outputs.publishedPackages)[0].version }}
     strategy:
       fail-fast: false
       matrix:
@@ -60,18 +64,6 @@ jobs:
           #   runner: windows-latest
 
     steps:
-      - name: Get release info
-        id: get-release-info
-        uses: octokit/request-action@v2.x
-        env:
-          TAG: ${{ fromJson(needs.release.outputs.publishedPackages)[0].version }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          route: GET /repos/{owner}/{repo}/releases/tags/{tag}
-          owner: dkozma
-          repo: c2pa-node
-          tag: ${{ env.TAG }}
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -130,7 +122,7 @@ jobs:
         # This needs to be set so that this works on a Windows runner
         shell: bash
         env:
-          ARCHIVE_FILENAME: c2pa-node_${{matrix.target}}-${{ github.event.release.tag_name || 'dev' }}.zip
+          ARCHIVE_FILENAME: c2pa-node_${{matrix.target}}-${{ env.PUBLISHED_VERSION || 'dev' }}.zip
         run: |
           cd generated
           7z a -tzip "${{ env.ARCHIVE_FILENAME }}" c2pa.node
@@ -146,14 +138,18 @@ jobs:
           retention-days: 3
 
       - name: Upload release asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
         if: ${{ needs.release.outputs.published }}
+        shell: bash
         env:
-          UPLOAD_URL: ${{ fromJson(steps.get-release-info.outputs.data).upload_url }}
+          OWNER: dkozma
+          REPO: c2pa-node
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: generated/${{ steps.package-artifact.outputs.archive }}
-          asset_name: ${{ steps.package-artifact.outputs.archive }}
-          asset_content_type: application/zip
+        run: |
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Content-Type: application/zip" \
+            "https://uploads.github.com/repos/${{ env.OWNER }}/${{ env.REPO}}/releases/${{ env.PUBLISHED_VERSION }}/assets?name=${{ steps.package-artifact.outputs.archive }}" \
+            --data-binary "@generated/${{ steps.package-artifact.outputs.archive }}"
