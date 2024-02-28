@@ -1,5 +1,11 @@
 # c2pa-node
 
+## 0.5.15
+
+### Patch Changes
+
+- c89d644: Log info
+
 ## 0.5.14
 
 ### Patch Changes
