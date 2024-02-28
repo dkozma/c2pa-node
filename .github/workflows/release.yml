@@ -45,7 +45,7 @@ jobs:
 
   release-binaries:
     needs: release
-    if: ${{ needs.release.outputs.published == true }}
+    if: needs.release.outputs.published == 'true'
     name: Build binaries for ${{matrix.target}}
     runs-on: ${{matrix.runner}}
     env:
@@ -137,14 +137,14 @@ jobs:
       - name: Upload artifact (development only)
         id: upload-artifact
         uses: actions/upload-artifact@v4
-        if: ${{ needs.release.outputs.published == false }}
+        if: needs.release.outputs.published != 'true'
         with:
           name: ${{ steps.package-artifact.outputs.archive }}
           path: generated/${{ steps.package-artifact.outputs.archive }}
           retention-days: 3
 
       - name: Upload release asset
-        if: ${{ needs.release.outputs.published }}
+        if: needs.release.outputs.published == 'true'
         shell: bash
         env:
           OWNER: dkozma
